@@ -1,4 +1,4 @@
-const { Category, validate } = require("../models/category");
+const { Category, validateBody } = require("../models/category");
 const express = require("express");
 const router = express.Router();
 
@@ -8,10 +8,7 @@ router.get("/", async (req, res) => {
   res.send(categories);
 });
 
-router.post("/", async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post("/", validateBody, async (req, res) => {
   const category = new Category(req.body);
 
   await category.save();
@@ -19,10 +16,7 @@ router.post("/", async (req, res) => {
   res.send(category);
 });
 
-router.put("/:id", async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.put("/:id", validateBody, async (req, res) => {
   const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });

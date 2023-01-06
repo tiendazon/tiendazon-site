@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
+const validator = require("../middleware/joiValidator");
 
 const categorySchema = new mongoose.Schema({
   name: {
@@ -10,14 +11,12 @@ const categorySchema = new mongoose.Schema({
 
 const Category = mongoose.model("Category", categorySchema);
 
-function validateCategory(category) {
-  const schema = Joi.object({
-    name: Joi.string().required(),
-  });
-
-  return schema.validate(category);
-}
+const reqSchema = Joi.object({
+  name: Joi.string()
+    .required()
+    .messages({ "any.required": `El campo "name" es requerido` }),
+});
 
 exports.Category = Category;
 exports.categorySchema = categorySchema;
-exports.validate = validateCategory;
+exports.validateBody = validator(reqSchema);

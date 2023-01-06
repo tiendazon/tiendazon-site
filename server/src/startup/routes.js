@@ -8,7 +8,9 @@ const compression = require("compression");
 const express = require("express");
 
 module.exports = function (app) {
-  app.use(helmet()); // Capa de seguridad sobre el servidor (seguridad)
+  app.use(helmet());
+  app.use(compression());
+
   app.use(express.json());
 
   app.use("/categories", categories);
@@ -18,5 +20,4 @@ module.exports = function (app) {
   });
 
   app.use(errors);
-  app.use(compression()); // comprime las respuestas del servidor en gzip (Seguridad y performance)
 };
