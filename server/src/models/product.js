@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const { categorySchema } = require("./category");
 const validator = require("../middleware/joiValidator");
 const createUploader = require("../utils/multer");
+const cloudinary = require("../utils/cloudinary");
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -30,6 +31,10 @@ const productSchema = new mongoose.Schema({
 });
 
 const Product = mongoose.model("Product", productSchema);
+
+const removeImage = (cloudinaryId) => {
+  return cloudinary.uploader.destroy(cloudinaryId, { invalidate: true });
+};
 
 const reqSchema = Joi.object({
   name: Joi.string()
@@ -60,3 +65,4 @@ exports.Product = Product;
 exports.productSchema = productSchema;
 exports.validateBody = validator(reqSchema);
 exports.upload = createUploader(imageValidator);
+exports.removeImage = removeImage;
