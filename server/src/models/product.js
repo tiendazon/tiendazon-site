@@ -4,6 +4,7 @@ Joi.objectId = require("joi-objectid")(Joi);
 const mongoose = require("mongoose");
 const { categorySchema } = require("./category");
 const validator = require("../middleware/joiValidator");
+const createUploader = require("../utils/multer");
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -16,6 +17,14 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: categorySchema,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
+  cloudinaryId: {
+    type: String,
     required: true,
   },
 });
@@ -34,8 +43,20 @@ const reqSchema = Joi.object({
     "any.required": `El campo "categoryId" es requerido`,
     "string.pattern.name": `El campo "categoryId" debe ser un objectId valido para mongo`,
   }),
+  file: Joi.object().required().messages({
+    "any.required": `El campo "image" es requerido`,
+  }),
 });
+
+const VALID_IMAGE_TYPES = {
+  "image/jpg": "jpg",
+  "image/jpeg": "jpeg",
+  "image/png": "png",
+};
+
+const imageValidator = (mimetype) => VALID_IMAGE_TYPES[mimetype];
 
 exports.Product = Product;
 exports.productSchema = productSchema;
 exports.validateBody = validator(reqSchema);
+exports.upload = createUploader(imageValidator);

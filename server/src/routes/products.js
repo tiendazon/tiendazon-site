@@ -1,6 +1,7 @@
-const { Product, validateBody } = require("../models/product");
 const express = require("express");
+const { Product, validateBody, upload } = require("../models/product");
 const { Category } = require("../models/category");
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -9,13 +10,14 @@ router.get("/", async (req, res) => {
   res.send(products);
 });
 
-router.post("/", validateBody, async (req, res) => {
+router.post("/", upload.single("image"), validateBody, async (req, res) => {
   const { name, price, categoryId } = req.body;
+  const { path: image, filename: cloudinaryId } = req.file;
 
   const category = await Category.findById(categoryId);
   if (!category) return res.status(400).send("Categoría no encontrada");
 
-  const product = new Product({ name, price, category });
+  const product = new Product({ name, price, category, image, cloudinaryId });
   await product.save();
 
   res.send(product);
