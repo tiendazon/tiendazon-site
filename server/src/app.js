@@ -1,14 +1,17 @@
-const winston = require('winston')
-const express = require('express')
+const winston = require("winston");
+const express = require("express");
 
-require('dotenv').config()
+require("dotenv").config();
 
-const app = express()
+const app = express();
 
-require('./startup/logging')()
-require('./startup/routes')(app)
-require('./startup/db')()
+require("./startup/config")();
+require("./startup/logging")();
+require("./startup/routes")(app);
+require("./startup/db")();
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000;
 
-app.listen(port, () => winston.info(`Servidor corriendo en http://localhost:${port}`))
+app.listen(port, () =>
+  winston.info(`Servidor corriendo en http://localhost:${port}`)
+);

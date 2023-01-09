@@ -6,6 +6,8 @@ const {
   removeImage,
 } = require("../models/product");
 const { Category } = require("../models/category");
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 const router = express.Router();
 
@@ -15,41 +17,53 @@ router.get("/", async (req, res) => {
   res.send(products);
 });
 
-router.post("/", upload.single("image"), validateBody, async (req, res) => {
-  const { name, price, categoryId } = req.body;
-  const { path: image, filename: cloudinaryId } = req.file;
+router.post(
+  "/",
+  [auth, admin],
+  upload.single("image"),
+  validateBody,
+  async (req, res) => {
+    const { name, price, categoryId } = req.body;
+    const { path: image, filename: cloudinaryId } = req.file;
 
-  const category = await Category.findById(categoryId);
-  if (!category) return res.status(400).send("Categoría no encontrada");
+    const category = await Category.findById(categoryId);
+    if (!category) return res.status(400).send("Categoría no encontrada");
 
-  const product = new Product({ name, price, category, image, cloudinaryId });
-  await product.save();
+    const product = new Product({ name, price, category, image, cloudinaryId });
+    await product.save();
 
-  res.send(product);
-});
+    res.send(product);
+  }
+);
 
-router.put("/:id", upload.single("image"), validateBody, async (req, res) => {
-  const { name, price, categoryId } = req.body;
-  const { path: image, filename: cloudinaryId } = req.file;
+router.put(
+  "/:id",
+  auth,
+  upload.single("image"),
+  validateBody,
+  async (req, res) => {
+    const { name, price, categoryId } = req.body;
+    const { path: image, filename: cloudinaryId } = req.file;
 
-  let product = await Product.findById(req.params.id);
-  if (!product) return res.status(400).send("Producto no encontrado");
+    let product = await Product.findById(req.params.id);
+    if (!product) return res.status(400).send("Producto no encontrado");
 
-  await removeImage(product.cloudinaryId);
+    await removeImage(product.cloudinaryId);
 
-  const category = await Category.findById(categoryId);
-  if (!category) return res.status(400).send("Categoría no encontrada");
+    const category = await Category.findById(categoryId);
+    if (!category) return res.status(400).send("Categoría no encontrada");
 
-  product = await Product.findByIdAndUpdate(
-    req.params.id,
-    { name, price, category, image, cloudinaryId },
-    { new: true }
-  );
+    product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { name, price, category, image, cloudinaryId },
+      { new: true }
+    );
 
-  res.send(product);
-});
+    res.send(product);
+  }
+);
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
   const product = await Product.findByIdAndDelete(req.params.id);
   if (!product) return res.status(400).send("Producto no encontrado");
 

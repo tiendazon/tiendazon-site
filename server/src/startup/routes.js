@@ -3,6 +3,8 @@ require("express-async-errors");
 const errors = require("../middleware/errors");
 const categories = require("../routes/categories");
 const products = require("../routes/products");
+const users = require("../routes/users");
+const auths = require("../routes/auths");
 
 const helmet = require("helmet");
 const compression = require("compression");
@@ -16,6 +18,8 @@ module.exports = function (app) {
 
   app.use("/categories", categories);
   app.use("/products", products);
+  app.use("/users", users);
+  app.use("/auths", auths);
 
   app.get("/ping", (req, res) => {
     res.send("pong");

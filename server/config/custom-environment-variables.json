@@ -1,0 +1,4 @@
+{
+  "jwtPrivateKey": "TIENDAZON_JWT_PRIVATE_KEY",
+  "db": "MONGO_URI"
+}
