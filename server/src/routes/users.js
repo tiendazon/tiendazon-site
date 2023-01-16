@@ -17,7 +17,10 @@ router.post("/", validateBody, async (req, res) => {
   await user.save();
 
   const token = user.generateToken();
-  res.header("x-auth-token", token).send("Usuario autentificado");
+  res
+    .header("x-auth-token", token)
+    .header("access-control-expose-headers", "x-auth-token")
+    .send("Usuario autentificado");
 });
 
 module.exports = router;

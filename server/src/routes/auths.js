@@ -24,7 +24,10 @@ router.post("/", validator(reqSchema), async (req, res) => {
   if (!isValid) return res.status(400).send("Email y password invalidos");
 
   const token = user.generateToken();
-  res.header("x-auth-token", token).send("Usuario autentificado");
+  res
+    .header("x-auth-token", token)
+    .header("access-control-expose-headers", "x-auth-token")
+    .send("Usuario autentificado");
 });
 
 module.exports = router;

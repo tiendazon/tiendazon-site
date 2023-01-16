@@ -10,7 +10,7 @@ require("./startup/logging")();
 require("./startup/routes")(app);
 require("./startup/db")();
 
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 app.listen(port, () =>
   winston.info(`Servidor corriendo en http://localhost:${port}`)

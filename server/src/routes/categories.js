@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(categories);
 });
 
-router.post("/", [auth, admin], validateBody, async (req, res) => {
+router.post("/", validateBody, async (req, res) => {
   const category = new Category(req.body);
 
   await category.save();
