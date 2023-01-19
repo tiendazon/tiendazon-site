@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Form from "../components/common/Form";
 import Joi from "joi-browser";
 import { toast } from "react-toastify";
@@ -6,6 +7,9 @@ import user from "../services/userService";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [inputValues, setInputValues] = useState({});
+  const [error, setError] = useState({});
+
   const [, dispatch] = AuthConsumer();
   const navigate = useNavigate();
 
@@ -21,6 +25,7 @@ const Login = () => {
       dispatch({ type: isAdmin ? "admin" : "login" });
       navigate(-1);
     } catch (err) {
+      console.log(err);
       if (err.response.status === 400) toast.error(err.response.data);
     }
   };
@@ -35,6 +40,8 @@ const Login = () => {
       header="Acceso a cuenta"
       submitLabel="Login"
       validSchema={schema}
+      inputValuesState={[inputValues, setInputValues]}
+      errorState={[error, setError]}
     />
   );
 };

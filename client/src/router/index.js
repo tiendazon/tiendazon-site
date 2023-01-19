@@ -1,9 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 
-import Posts from "../pages/Posts";
-import CreatePost from "../pages/createPost";
-import UpdatePost from "../pages/updatePost";
+import AdminCategories from "../pages/AdminCategories";
+import AdminProducts from "../pages/AdminProducts";
 import Catalog from "../pages/Catalog";
 import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
@@ -22,23 +21,39 @@ const router = createBrowserRouter([
         element: <Catalog />,
       },
       {
-        path: "/posts",
+        path: "/categorias",
         element: (
           <ProtectedRoute isAllowed={"isAdmin"}>
-            <Posts />
+            <AdminCategories />
           </ProtectedRoute>
         ),
       },
 
       {
-        path: "/posts/:postId",
-        element: <UpdatePost />,
+        path: "/categorias/:categoryId",
+        element: (
+          <ProtectedRoute isAllowed={"isAdmin"}>
+            <AdminCategories />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/new-post",
-        element: <CreatePost />,
+        path: "/productos",
+        element: (
+          <ProtectedRoute isAllowed={"isAdmin"}>
+            <AdminProducts />
+          </ProtectedRoute>
+        ),
       },
 
+      {
+        path: "/productos/:productId",
+        element: (
+          <ProtectedRoute isAllowed={"isAdmin"}>
+            <AdminProducts />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "/login",
         element: (
