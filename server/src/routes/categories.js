@@ -6,12 +6,23 @@ const admin = require("../middleware/admin");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const categories = await Category.find({});
+  const categories = await Category.find({}).sort("name");
 
   res.send(categories);
 });
 
-router.post("/", validateBody, async (req, res) => {
+router.get("/:id", [auth, admin], async (req, res) => {
+  try {
+    const categorie = await Category.findById(req.params.id);
+    if (!categorie) return res.status(404).send("Categoría no encontrada");
+
+    res.send(categorie);
+  } catch (err) {
+    if (err.kind === "ObjectId") res.status(400).send("Categoría no valida");
+  }
+});
+
+router.post("/", [auth, admin], validateBody, async (req, res) => {
   const category = new Category(req.body);
 
   await category.save();
@@ -19,7 +30,7 @@ router.post("/", validateBody, async (req, res) => {
   res.send(category);
 });
 
-router.put("/:id", auth, validateBody, async (req, res) => {
+router.put("/:id", [auth, admin], validateBody, async (req, res) => {
   const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });

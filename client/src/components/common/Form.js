@@ -1,7 +1,7 @@
-import { useState } from "react";
 import Button from "react-bootstrap/Button";
-import Input from "./Input";
+import renderInput from "./FormInputs";
 import Joi from "joi-browser";
+import _ from "lodash";
 
 const Form = ({
   inputs = [],
@@ -9,14 +9,22 @@ const Form = ({
   onSubmit = () => {},
   submitLabel = "Enviar",
   validSchema,
+  inputValuesState = {},
+  errorState = {},
 }) => {
-  const [inputValues, setInputValues] = useState({});
-  const [error, setError] = useState({});
+  const [inputValues, setInputValues] = inputValuesState;
+  const [error, setError] = errorState;
 
   const handleChange = ({ target: input }) => {
+    let value = input.value;
+
+    if (input.type === "file") {
+      value = URL.createObjectURL(input.files[0]);
+    }
+
     setInputValues((prevValue) => ({
       ...prevValue,
-      [input.name]: input.value,
+      [input.name]: value,
     }));
   };
 
@@ -38,27 +46,39 @@ const Form = ({
     }
 
     setError({});
-    onSubmit(inputValues);
+
+    let formData = inputValues;
+    if (_.find(inputs, { type: "image" })) formData = new FormData(e.target);
+
+    onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {inputs.map(({ name, label, ...rest }) => (
-        <Input
-          key={name}
-          name={name}
-          label={label}
-          value={inputValues[name] || ""}
-          errors={error}
-          onChange={handleChange}
-          {...rest}
-        ></Input>
-      ))}
+    <>
+      <h2>{header}</h2>
+      <form onSubmit={handleSubmit}>
+        {inputs.map(({ name, label, type = "text", ...rest }) => {
+          const Input = renderInput[type];
 
-      <Button disabled={validate()} type="submit">
-        Submit
-      </Button>
-    </form>
+          return (
+            <Input
+              key={name}
+              name={name}
+              label={label}
+              value={inputValues[name] || ""}
+              errors={error}
+              onChange={handleChange}
+              type={type}
+              {...rest}
+            ></Input>
+          );
+        })}
+
+        <Button disabled={validate()} type="submit">
+          {submitLabel}
+        </Button>
+      </form>
+    </>
   );
 };
 

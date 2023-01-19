@@ -53,6 +53,8 @@ const reqSchema = Joi.object({
   }),
 });
 
+const reqUpdateSchema = reqSchema.fork(["file"], (schema) => schema.optional());
+
 const VALID_IMAGE_TYPES = {
   "image/jpg": "jpg",
   "image/jpeg": "jpeg",
@@ -64,5 +66,6 @@ const imageValidator = (mimetype) => VALID_IMAGE_TYPES[mimetype];
 exports.Product = Product;
 exports.productSchema = productSchema;
 exports.validateBody = validator(reqSchema);
+exports.validateUpdateBody = validator(reqUpdateSchema);
 exports.upload = createUploader(imageValidator);
 exports.removeImage = removeImage;

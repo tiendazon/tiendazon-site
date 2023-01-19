@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import _ from "lodash";
 
 import Spinner from "react-bootstrap/Spinner";
@@ -15,6 +15,7 @@ import useCategories from "../hooks/useCategories";
 import paginate from "../utils/paginate";
 
 import AuthConsumer from "../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const pageSize = 10;
 
@@ -39,7 +40,17 @@ function Catalog() {
   const [searchedProductName, setSearchedProductName] = useState("");
 
   const [user, dispatch] = AuthConsumer();
-  console.log(user);
+
+  useEffect(() => {
+    if (user.isAdmin) {
+      columns[1].component = (name, product) => (
+        <Link to={`/productos/${product._id}`}>{name}</Link>
+      );
+    }
+
+    return () => delete columns[1].component;
+  }, [user]);
+
   const handleSelectCategory = (category) => {
     setSelectedCategory(category);
     setCurrentPage(1);
@@ -64,12 +75,8 @@ function Catalog() {
 
   if (!_.isEmpty(selectedCategory)) {
     allProducts = allProducts.filter((product) => {
-      console.log(product.category._id, selectedCategory._id);
-      console.log();
-
       return product.category._id === selectedCategory._id;
     });
-    console.log(allProducts);
   }
 
   if (!_.isEmpty(sortedColumn))

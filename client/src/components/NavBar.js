@@ -19,9 +19,14 @@ const NavBar = () => {
             Inicio
           </NavLink>
           {isAdmin && (
-            <NavLink className="nav-link" to="posts">
-              Posts
-            </NavLink>
+            <>
+              <NavLink className="nav-link" to="/categorias">
+                Gestión categorías
+              </NavLink>
+              <NavLink className="nav-link" to="/productos">
+                Gestión productos
+              </NavLink>
+            </>
           )}
 
           {!isAuth && (

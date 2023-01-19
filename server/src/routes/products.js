@@ -2,6 +2,7 @@ const express = require("express");
 const {
   Product,
   validateBody,
+  validateUpdateBody,
   upload,
   removeImage,
 } = require("../models/product");
@@ -15,6 +16,17 @@ router.get("/", async (req, res) => {
   const products = await Product.find({});
 
   res.send(products);
+});
+
+router.get("/:id", [auth, admin], async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).send("Producto no encontrado");
+
+    res.send(product);
+  } catch (err) {
+    if (err.kind === "ObjectId") res.status(400).send("Producto no valido");
+  }
 });
 
 router.post(
@@ -36,29 +48,38 @@ router.post(
   }
 );
 
-router.put("/:id", upload.single("image"), validateBody, async (req, res) => {
-  const { name, price, categoryId } = req.body;
-  const { path: image, filename: cloudinaryId } = req.file;
+router.put(
+  "/:id",
+  [auth, admin],
+  upload.single("image"),
+  validateUpdateBody,
+  async (req, res) => {
+    const { name, price, categoryId } = req.body;
 
-  let product = await Product.findById(req.params.id);
-  if (!product) return res.status(400).send("Producto no encontrado");
+    let product = await Product.findById(req.params.id);
+    if (!product) return res.status(400).send("Producto no encontrado");
 
-  await removeImage(product.cloudinaryId);
+    const category = await Category.findById(categoryId);
+    if (!category) return res.status(400).send("Categoría no encontrada");
 
-  const category = await Category.findById(categoryId);
-  if (!category) return res.status(400).send("Categoría no encontrada");
+    let body = { name, price, category };
 
-  product = await Product.findByIdAndUpdate(
-    req.params.id,
-    { name, price, category, image, cloudinaryId },
-    { new: true }
-  );
+    if (req.file) {
+      const { path: image, filename: cloudinaryId } = req.file;
+      body = { ...body, image, cloudinaryId };
 
-  res.send(product);
-});
+      await removeImage(product.cloudinaryId);
+    }
 
-router.delete("/:id", async (req, res) => {
-  console.log("Hola");
+    product = await Product.findByIdAndUpdate(req.params.id, body, {
+      new: true,
+    });
+
+    res.send(product);
+  }
+);
+
+router.delete("/:id", [auth, admin], async (req, res) => {
   const product = await Product.findByIdAndDelete(req.params.id);
   if (!product) return res.status(400).send("Producto no encontrado");
 

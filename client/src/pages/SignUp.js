@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Form from "../components/common/Form";
 import http from "../services/httpService";
 import Joi from "joi-browser";
@@ -7,6 +8,8 @@ import user from "../services/userService";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const [inputValues, setInputValues] = useState({});
+  const [error, setError] = useState({});
   const [, dispatch] = AuthConsumer();
   const navigate = useNavigate();
 
@@ -39,6 +42,8 @@ const SignUp = () => {
       header="Crear una cuenta"
       submitLabel="Registrarse"
       validSchema={schema}
+      inputValuesState={[inputValues, setInputValues]}
+      errorState={[error, setError]}
     />
   );
 };
